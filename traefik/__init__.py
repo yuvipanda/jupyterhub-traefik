@@ -16,7 +16,7 @@ class Traefik(Proxy):
         return os.path.join(self.prefix, *args)
 
     @gen.coroutine
-    def add_route(self, routespec, backend, data):
+    def add_route(self, routespec, backend, data=None):
         if routespec.startswith('/'):
             # url only spec
             host = None
@@ -38,8 +38,9 @@ class Traefik(Proxy):
             self.client.write(self._k(
                 'frontends', name, 'routes', 'host', 'rule'), 'Host:{}'.format(host))
 
-        self.client.write(
-            self._k('frontends', name, 'extra'), json.dumps(data))
+        if data:
+            self.client.write(
+                self._k('frontends', name, 'extra'), json.dumps(data))
 
     @gen.coroutine
     def get_route(self, routespec):
